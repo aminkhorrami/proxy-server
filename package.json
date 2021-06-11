@@ -1,0 +1,17 @@
+{
+  "name": "proxy-server",
+  "version": "1.0.0",
+  "description": "a proxy server. express.",
+  "main": "index.js",
+  "repository": "https://github.com/aminkhorrami/proxy-server.git",
+  "author": "aminkhorrami <a.khorrami71@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "http-proxy-middleware": "^2.0.0",
+    "morgan": "^1.10.0"
+  }
+}
