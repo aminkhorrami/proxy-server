@@ -7,7 +7,7 @@ const app = express();
 
 // Configuration
 const PORT = 5000;
-const HOST = "localhost";
+// const HOST = "localhost";
 const API_SERVICE_URL = "https://jsonplaceholder.typicode.com";
 
 // Logging
@@ -43,7 +43,7 @@ app.use(
 
 // Start the Proxy
 app.listen(PORT, HOST, () => {
-  console.log(`Starting Proxy at ${HOST}:${PORT}`);
+  console.log(`Starting Proxy at ${proocess.env.PORT || PORT}`);
 });
 
 // 'user stritct';
