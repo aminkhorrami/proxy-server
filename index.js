@@ -5,6 +5,9 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 // Create Express Server
 const app = express();
 
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, "client/build")));
+
 // Configuration
 const PORT = 5000;
 // const HOST = "localhost";
@@ -13,11 +16,24 @@ const API_SERVICE_URL = "https://jsonplaceholder.typicode.com";
 // Logging
 app.use(morgan("dev"));
 
+app.get("/dashboard", (req, res) => {
+  // const count = 5;
+
+  // // Generate some passwords
+  // const passwords = Array.from(Array(count).keys()).map((i) =>
+  //   generatePassword(12, false)
+  // );
+
+  // // Return them as json
+  // res.json(passwords);
+
+  // console.log(`Sent ${count} passwords`);
+  res.send("FUCK OFF!");
+});
+
 // Info GET endpoint
-app.get("/info", (req, res, next) => {
-  res.send(
-    "This is a proxy service which proxies to Billing and Account APIs."
-  );
+app.get("*", (req, res, next) => {
+  res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
 
 // Authorization
