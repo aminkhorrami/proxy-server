@@ -1,6 +1,7 @@
 // https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.6
+
 module.exports = {
-  ProxyServer: () => {
+  ProxyServer: function () {
     const net = require("net");
     // import net from "net";
     //Creates a new TCP or IPC server.
@@ -35,11 +36,11 @@ module.exports = {
           serverAddress = data.toString().split("Host: ")[1].split("\r\n")[0];
         }
 
-        console.log(serverAddress);
+        console.log("host", serverAddress);
 
         // https://nodejs.org/api/net.html#net_net_createconnection
         // A factory function, which creates a new net.Socket, immediately initiates connection with socket.connect()
-
+        // Following is a SocketClient of the Target server
         let proxyToServerSocket = net.createConnection(
           {
             host: serverAddress,
@@ -53,13 +54,37 @@ module.exports = {
             } else {
               proxyToServerSocket.write(data);
             }
-            // Sockets are derived from the streams so they can be piped.
 
+            // Sockets are derived from the streams so they can be piped.
             // readableSrc**.pipe( **writableDest** )
 
-            clientToProxySocket.pipe(proxyToServerSocket);
-            proxyToServerSocket.pipe(clientToProxySocket);
+            // if the serverAddress is in ProxyFilteredList
+            // you can not access them!
 
+            if (this.isThisURLFiltered(serverAddress)) {
+              // proxyToServerSocket.end();
+              // proxyToServerSocket.write();
+              clientToProxySocket.pipe(proxyToServerSocket);
+
+              //The pipe() function reads data from a readable stream as
+              //it becomes available and writes it to a destination writable stream.
+              proxyToServerSocket.pipe(clientToProxySocket);
+              console.log(
+                "clientToProxySocket:",
+                //The amount of received bytes.
+                clientToProxySocket.bytesRead,
+                //The amount of bytes sent.
+                clientToProxySocket.bytesWritten,
+                clientToProxySocket.address(),
+                "\n proxyToServerSocket",
+                proxyToServerSocket.bytesRead,
+                proxyToServerSocket.bytesWritten,
+                proxyToServerSocket.address()
+              );
+            } else {
+              clientToProxySocket.pipe(proxyToServerSocket);
+              proxyToServerSocket.pipe(clientToProxySocket);
+            }
             proxyToServerSocket.on("error", (err) => {
               console.log("PROXY TO SERVER ERROR");
               console.log(err);
@@ -91,4 +116,11 @@ module.exports = {
       );
     });
   },
+  isThisURLFiltered: function (url) {
+    for (let i of this.filteredURLs)
+      if (i === url) return true;
+      else return false;
+  },
+  saveRequestsOnDataBase: function () {},
+  filteredURLs: ["example.com", "isna.ir"],
 };
