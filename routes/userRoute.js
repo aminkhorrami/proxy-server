@@ -1,23 +1,27 @@
-import express from "express";
+const express = require("express");
 
-import {
+const {
   login,
   protect,
-  restrictTo,
+  // restrictTo,
   logout,
-} from "../controllers/authController.js";
+  signup,
+} = require("../controllers/authController.js");
 
-import { getMe } from "../controllers/userController.js";
+// import { getMe }  = require("../controllers/userController.js");
 
-export const router = express.Router();
+const router = express.Router();
 
-router.post("/login", login);
-router.get("/logout", logout);
+// router.post("/login", login);
+// router.get("/logout", logout);
+router.post("/signup", signup);
 
 // ** CARE **
 // Middleware (Location Sensitive)
 // Protect all routes after this middleware
 
-router.use(protect);
+// router.use(protect);
 
-router.get("/me", getMe);
+// router.get("/me", getMe);
+
+exports.router = router;

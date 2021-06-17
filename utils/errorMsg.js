@@ -1,4 +1,4 @@
-export const Errors = {
+const Errors = {
   UNEXPECTED_ERROR: "مشکلی پیش آمد. دوباره تلاش کنید.",
   INPUT_ERROR: "مشکلی در ورودی ها وجود دارد. دوباره امتحان کنید",
   TRY_AGAIN: "لطفا دوباره تلاش کنید",
@@ -76,3 +76,5 @@ export const Errors = {
   SALECODE_NOT_FOUND: "کد تخفیف یافت نشد",
   NO_PHONE: "لطفا شماره ی خود را وارد کنید",
 };
+
+exports.Errors = Errors;

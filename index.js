@@ -1,13 +1,14 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const path = require("path");
 const express = require("express");
 const { DataBase, MongoAuth, MongoUser } = require("./envVariables.js");
 const ProxyModule = require("./proxyServer.js");
-// const router = require("./routes/userRoute.js");
+const { router } = require("./routes/userRoute.js");
 
 process.on("uncaughtException", (err) => {
-  console.log("UNCAUGHT_EXCEPTION!   Shutting down...");
+  console.log("UNCAUGHT_EXCEPTION! Shutting down...");
   console.log(err.name, err.message);
   process.exit(1);
 });
@@ -26,16 +27,20 @@ app.use(morgan("dev"));
 
 const dashboardServer = () => {
   const instanceOfServer = app.listen(PORT, () => {
-    // app.use("/api/v1/users", router);
+    // User Specific Routes
+    app.use("/api/v1/users", router);
     // app.get("/dashboard", (req, res) => {
     //   res.send("FUCK OFF!");
     // });
-
     app.get("*", (req, res, next) => {
       res.sendFile(path.join(__dirname + "/client/build/index.html"));
     });
 
-    console.log(`Dashboard Server Running on ${PORT} ...!!!`);
+    console.log(
+      "%c%s",
+      "color: green;",
+      `Dashboard Server Running on http://localhost:${PORT} \n`
+    );
   });
   instanceOfServer.on("close", () => {
     mongoose.connection.close();
@@ -48,33 +53,31 @@ const dashboardServer = () => {
 // then our proxy!
 
 const dbConnection = () => {
-  ProxyModule.ProxyServer();
-  console.log("DATA BASE", DataBase);
-  // return mongoose
-  //   .connect(DB, {
-  //     auth: {
-  //       user: MongoUser,
-  //       password: MongoAuth,
-  //     },
-  //     useNewUrlParser: true,
-  //     useCreateIndex: true,
-  //     useFindAndModify: false,
-  //     useUnifiedTopology: true,
-  //     poolSize: 10,
-  //   })
-  //   .then(() => {
-  //     console.log("DB connection successful!");
-  //     dashboardServer();
-  //   })
-  //   .catch((e) => {
-  //     console.error(
-  //       "Failed to connect to mongo on startup - retrying in 5 sec",
-  //       e
-  //     );
-  //     mongoose.connection.close();
-  //     dashboardServer().close();
-  //     setTimeout(dbConnection, 5000);
-  //   });
+  return mongoose
+    .connect(DataBase, {
+      auth: {
+        user: MongoUser,
+        password: MongoAuth,
+      },
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+      useUnifiedTopology: true,
+      poolSize: 10,
+    })
+    .then(() => {
+      console.log("%c%s", "color: green;", "DB connection successful! \n");
+      dashboardServer();
+    })
+    .catch((e) => {
+      console.error(
+        "Failed to connect to mongo on startup - retrying in 5 sec",
+        e
+      );
+      mongoose.connection.close();
+      dashboardServer().close();
+      setTimeout(dbConnection, 5000);
+    });
 };
 
 mongoose.connection.on("close", () => {
@@ -95,6 +98,6 @@ process.on("unhandledRejection", (err) => {
   });
 });
 
-//makeInitialDir();
+ProxyModule.ProxyServer();
 
 dbConnection();

@@ -84,7 +84,11 @@ module.exports = {
     });
 
     server.listen(8124, () => {
-      console.log("Proxy Server runnig at http://localhost:" + 8124);
+      console.log(
+        "%c%s",
+        "color: green;",
+        "Proxy Server runnig at http://localhost:" + 8124 + "\n"
+      );
     });
   },
 };

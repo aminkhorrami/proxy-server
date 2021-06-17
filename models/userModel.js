@@ -1,7 +1,6 @@
-import crypto from "crypto";
-import mongoose from "mongoose";
-// import { isEmail } from "validator";
-import bcrypt from "bcryptjs";
+const crypto = require("crypto");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -17,8 +16,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["user", "admin", "operator", "ultra-admin", "blogger"],
-    default: "user",
+    enum: ["user", "admin"],
+    default: "admin",
   },
   password: {
     type: String,
@@ -29,79 +28,76 @@ const userSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, "Please confirm your password"],
-    validate: {
-      // TODO: This only works on CREATE and SAVE!!!
-      validator: function (el) {
-        return el === this.password;
-      },
-      message: "Passwords are not the same!",
-    },
+    // validate: {
+    //   // TODO: This only works on CREATE and SAVE!!!
+    //   validator: function (el) {
+    //     return el === this.password;
+    //   },
+    //   message: "Passwords are not the same!",
+    // },
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
 });
 
-userSchema.pre("save", async function (next) {
-  // Only run this function if password was actually modified
-  if (!this.isModified("password")) return next();
+// userSchema.pre("save", async function (next) {
+//   // Only run this function if password was actually modified
+//   if (!this.isModified("password")) return next();
 
-  // Hash the password with cost of 12
-  this.password = await bcrypt.hash(this.password, 12);
+//   // Hash the password with cost of 12
+//   this.password = await bcrypt.hash(this.password, 12);
 
-  this.passwordConfirm = undefined;
-  next();
-});
+//   this.passwordConfirm = undefined;
+//   next();
+// });
 
-userSchema.pre("save", function (next) {
-  if (!this.isModified("password") || this.isNew) return next();
+// userSchema.pre("save", function (next) {
+//   if (!this.isModified("password") || this.isNew) return next();
+//   this.passwordChangedAt = Date.now() - 1000;
+//   next();
+// });
 
-  if (this.role !== "operator") this.plansToOperate = [];
+// userSchema.pre(/^find/, function (next) {
+//   this.populate("bookings");
+//   // this points to the current query
+//   this.find({ active: { $ne: false } });
+//   next();
+// });
 
-  this.passwordChangedAt = Date.now() - 1000;
-  next();
-});
+// userSchema.methods.correctPassword = async function (
+//   candidatePassword,
+//   userPassword
+// ) {
+//   return await bcrypt.compare(candidatePassword, userPassword);
+// };
 
-userSchema.pre(/^find/, function (next) {
-  this.populate("bookings");
-  // this points to the current query
-  this.find({ active: { $ne: false } });
-  next();
-});
+// userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+//   if (this.passwordChangedAt) {
+//     const changedTimestamp = parseInt(
+//       this.passwordChangedAt.getTime() / 1000,
+//       10
+//     );
+//     return JWTTimestamp < changedTimestamp;
+//   }
 
-userSchema.methods.correctPassword = async function (
-  candidatePassword,
-  userPassword
-) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-};
+//   // False means not changed
+//   return false;
+// };
 
-userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
-  if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000,
-      10
-    );
-    return JWTTimestamp < changedTimestamp;
-  }
+// userSchema.methods.createPasswordResetToken = function () {
+//   const resetToken = crypto.randomBytes(7).toString("hex").toLocaleUpperCase();
 
-  // False means not changed
-  return false;
-};
+//   this.passwordResetToken = crypto
+//     .createHash("sha256")
+//     .update(resetToken)
+//     .digest("hex");
 
-userSchema.methods.createPasswordResetToken = function () {
-  const resetToken = crypto.randomBytes(7).toString("hex").toLocaleUpperCase();
+//   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
-  this.passwordResetToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
-
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-
-  return resetToken;
-};
+//   return resetToken;
+// };
 
 const User = mongoose.model("User", userSchema);
 
-export default User;
+exports.User = User;
