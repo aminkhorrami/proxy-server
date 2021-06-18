@@ -1,13 +1,5 @@
 // All javascript code in this project for now is just for demo DON'T RELY ON IT
 
-const getConnectionData = async () => {
-  const res = await fetch('http://localhost:5000/api/v1/users/getRecords')
-  const data = await res.json()
-  console.log('dataaa', data)
-  return data
-}
-
-getConnectionData()
 const random = (max = 100) => {
   return Math.round(Math.random() * max) + 20
 }
@@ -237,7 +229,3 @@ const fakeUsersCount = () => {
   activeUsersChart.update()
   usersCount.innerText = randomUserCount
 }
-
-setInterval(() => {
-  fakeUsersCount()
-}, 1000)
