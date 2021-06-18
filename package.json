@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
-    "heroku-postbuild": "cd client && yarn && yarn run build"
+    "heroku-postbuild": "cd clientv2 && yarn && yarn run production"
   },
   "dependencies": {
     "axios": "^0.21.1",
