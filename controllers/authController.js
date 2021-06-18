@@ -108,6 +108,7 @@ exports.getConnectionRecords = getAll(Connection);
 exports.signup = signup;
 exports.login = login;
 exports.logout = logout;
+exports.admins = getAll(User);
 
 // export const protect = catchAsync(async (req, res, next) => {
 //   // 1) Getting token and check if it's there

@@ -8,10 +8,11 @@ const {
   signup,
   createConnectionRecord,
   getConnectionRecords,
+  admins,
 } = require("../controllers/authController.js");
 
 const router = express.Router();
-
+router.get("/", admins);
 router.post("/login", login);
 router.post("/signup", signup);
 router.get("/logout", logout);
