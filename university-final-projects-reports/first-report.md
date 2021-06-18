@@ -24,7 +24,7 @@
 
 برای همراه شدن با کد از اینجا به بعد میتونید از لینک زیر کد پیاده شده رو مشاهده کنید:
 
-https://github.com/aminkhorrami/simple\_purchase\_app\_on\_ethereum
+[https://github.com/aminkhorrami/simple\_purchase\_app\_on\_ethereum](https://github.com/aminkhorrami/simple_purchase_app_on_ethereum)
 
 برای شروع باید ذکر کنم که اصولا چون بروزر های فعلی ما از api های شبکه های بلاکچینی برخوردار نیستن ما نیاز داریم که اول بروزرهامون رو با افزونه های مشخصی به این دنیا متصل کنیم! [Metamask](https://metamask.io/) از محصولات خوبیه که مثل یه gateway هم شما رو به این دنیای dapps ها متصل میکنه \( چون اینجا دیگه از اون رویکرد centralized خبری نیست مشخصا\)، و از طرفی یک ولت رو هم رو بروزرتون درست میکنه که کار رو خیلی راحت میکنه.\(‌ راحت میشه حساب ها رو track کرد.\)
 
@@ -60,7 +60,7 @@ Firefox: [https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/](https:
 
 برای داشتن اتر رایگان لطفا از پلتفرم زیر استفاده کنید:
 
-https://faucet.kovan.network/
+[https://faucet.kovan.network/](https://faucet.kovan.network/)
 
 در اینجا هم شما میتونید برنامه رو با داشتن نت ماسک به روی بروزرتون مشاهده کنید.\(‌ روی پلتفرم هیروکو برنامه رو دیپلوی کردم.\):
 
@@ -72,7 +72,7 @@ https://faucet.kovan.network/
 
 از کتاب Kedar\_Iyer,\_Chris\_Dannen\_Building\_games\_with\_Ethereum\_smart\_contracts سعی دارم برای پیاده سازی بخش فرانت کمک بگیرم. لینکی رو پایین تر از کتاب قرار میدم.
 
-https://www.dropbox.com/s/e2da31lgajrgioe/Kedar\_Iyer%2C\_Chris\_Dannen\_Building\_games\_with\_Ethereum\_smart\_contracts.pdf?dl=0
+[https://www.dropbox.com/s/e2da31lgajrgioe/Kedar\_Iyer%2C\_Chris\_Dannen\_Building\_games\_with\_Ethereum\_smart\_contracts.pdf?dl=0](https://www.dropbox.com/s/e2da31lgajrgioe/Kedar_Iyer%2C_Chris_Dannen_Building_games_with_Ethereum_smart_contracts.pdf?dl=0)
 
 بسیار ممنونم بابت وقتی که گذاشتید. ممنون میشم نظرتون رو در مورد ادامه پروژه به بنده بگید استاد.
 
