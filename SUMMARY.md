@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Projects main questions](README.md)
+* [Proxy Server main questions](README.md)
 
 ## internet engineering
 
