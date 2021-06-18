@@ -3,20 +3,24 @@
 module.exports = {
   ProxyServer: function () {
     const net = require("net");
-    // import net from "net";
+    const { PostRequest } = require("./PostRequest.js");
+
     //Creates a new TCP or IPC server.
     const server = net.createServer();
 
     server.on("connection", (clientToProxySocket) => {
       console.log("Client Connected To Proxy");
       // We need only the data once, the starting packet
+
       clientToProxySocket.once("data", (data) => {
         // If you want to see the packet uncomment below
+
         console.log(data.toString());
 
         let isTLSConnection = data.toString().indexOf("CONNECT") !== -1;
 
         // on the web By Default port is 80
+
         let serverPort = 80;
         let serverAddress;
         if (isTLSConnection) {
@@ -41,6 +45,7 @@ module.exports = {
         // https://nodejs.org/api/net.html#net_net_createconnection
         // A factory function, which creates a new net.Socket, immediately initiates connection with socket.connect()
         // Following is a SocketClient of the Target server
+
         let proxyToServerSocket = net.createConnection(
           {
             host: serverAddress,
@@ -48,6 +53,7 @@ module.exports = {
           },
           () => {
             // the connected callBack is actually here!
+
             console.log("PROXY TO SERVER SET UP");
             if (isTLSConnection) {
               clientToProxySocket.write("HTTP/1.1 200 OK\r\n\n");
@@ -64,16 +70,15 @@ module.exports = {
             if (this.isThisURLFiltered(serverAddress)) {
               // proxyToServerSocket.end();
               // proxyToServerSocket.write();
-              clientToProxySocket.pipe(proxyToServerSocket);
 
               //The pipe() function reads data from a readable stream as
               //it becomes available and writes it to a destination writable stream.
+
+              clientToProxySocket.pipe(proxyToServerSocket);
               proxyToServerSocket.pipe(clientToProxySocket);
               console.log(
                 "clientToProxySocket:",
-                //The amount of received bytes.
-                clientToProxySocket.bytesRead,
-                //The amount of bytes sent.
+                clientToProxySocket.bytesWritten,
                 clientToProxySocket.bytesWritten,
                 clientToProxySocket.address(),
                 "\n proxyToServerSocket",
@@ -85,6 +90,22 @@ module.exports = {
               clientToProxySocket.pipe(proxyToServerSocket);
               proxyToServerSocket.pipe(clientToProxySocket);
             }
+
+            // make a record on MONGODB
+
+            const recordConnection = {
+              connectionDate: new Date(),
+              //The amount of received bytes.
+              receivedProxyBytes: clientToProxySocket.bytesRead,
+              //The amount of bytes sent.
+              WrittenProxyBytes: clientToProxySocket.bytesWritten,
+              proxyPort: clientToProxySocket.address().port,
+              gateWayPort: proxyToServerSocket.address().port,
+              requestForAFilteredSite: this.isThisURLFiltered(serverAddress),
+            };
+
+            PostRequest(recordConnection);
+
             proxyToServerSocket.on("error", (err) => {
               console.log("PROXY TO SERVER ERROR");
               console.log(err);
@@ -121,6 +142,5 @@ module.exports = {
       if (i === url) return true;
       else return false;
   },
-  saveRequestsOnDataBase: function () {},
-  filteredURLs: ["example.com", "isna.ir"],
+  filteredURLs: ["namnak.com", "isna.ir"],
 };

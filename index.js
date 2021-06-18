@@ -16,8 +16,16 @@ process.on("uncaughtException", (err) => {
 // Create Express Server
 const app = express();
 
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
+app.use(express.json());
+
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, "client/build")));
+app.use(express.static(path.join(__dirname, "clientv2/public")));
 
 // Dashboard Port
 const PORT = 5000;
@@ -27,13 +35,11 @@ app.use(morgan("dev"));
 
 const dashboardServer = () => {
   const instanceOfServer = app.listen(PORT, () => {
-    // User Specific Routes
+    // User Specific EndPoints
     app.use("/api/v1/users", router);
-    // app.get("/dashboard", (req, res) => {
-    //   res.send("FUCK OFF!");
-    // });
+
     app.get("*", (req, res, next) => {
-      res.sendFile(path.join(__dirname + "/client/build/index.html"));
+      res.sendFile(path.join(__dirname + "/clientv2/public/auth/login.html"));
     });
 
     console.log(
@@ -67,6 +73,7 @@ const dbConnection = () => {
     })
     .then(() => {
       console.log("%c%s", "color: green;", "DB connection successful! \n");
+
       dashboardServer();
     })
     .catch((e) => {
@@ -98,6 +105,6 @@ process.on("unhandledRejection", (err) => {
   });
 });
 
-ProxyModule.ProxyServer();
-
 dbConnection();
+
+ProxyModule.ProxyServer();

@@ -6,15 +6,20 @@ const {
   // restrictTo,
   logout,
   signup,
+  createConnectionRecord,
+  getConnectionRecords,
 } = require("../controllers/authController.js");
-
-// import { getMe }  = require("../controllers/userController.js");
 
 const router = express.Router();
 
-// router.post("/login", login);
-// router.get("/logout", logout);
+router.post("/login", login);
 router.post("/signup", signup);
+router.get("/logout", logout);
+
+// record date
+
+router.post("/record", createConnectionRecord);
+router.get("/getRecords", getConnectionRecords);
 
 // ** CARE **
 // Middleware (Location Sensitive)

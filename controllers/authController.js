@@ -1,94 +1,113 @@
 const jwt = require("jsonwebtoken");
 // import { promisify } from "util";
+const { User } = require("../models/userModel.js");
+const { Connection } = require("../models/connectionsModel.js");
+const { Errors } = require("../utils/errorMsg.js");
+const { APIFeatures } = require("../utils/apiFeatures.js");
+
+// import Email from '../utils/email';
+
 const catchAsync = (fn) => {
   return (req, res, next) => {
     fn(req, res, next).catch(next);
   };
 };
 
-//require("../utils/catchAsync.js");
-const { User } = require("../models/userModel.js");
-const { Errors } = require("../utils/errorMsg.js");
+//NO JWT ENABLED YET!
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
 
-// import Email from '../utils/email';
-
-// NO JWT ENABLED YET!
-// const signToken = (id) => {
-//   return jwt.sign({ id }, process.env.JWT_SECRET, {
-//     expiresIn: process.env.JWT_EXPIRES_IN,
-//   });
-// };
-
-// const createSendToken = (user, statusCode, res) => {
-//   const token = signToken(user._id);
-//   // Remove the password from the output
-//   user.password = undefined;
-//   res.status(statusCode).json({
-//     status: "success",
-//     token,
-//     data: {
-//       user: user,
-//     },
-//   });
-// };
-
-const signup = catchAsync(async (req, res, next) => {
-  // if (req.body.role === "admin") {
-  console.log("BODdddy", req.body);
-  const user = await User.create(req.body);
-  return res.status(201).json({
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  // Remove the password from the output
+  user.password = undefined;
+  res.status(statusCode).json({
     status: "success",
-    //token,
+    token,
     data: {
       user: user,
     },
   });
-  // } else {
-  //   return res.status(301).json({ status: "failed" });
-  // }
+};
+
+const signup = catchAsync(async (req, res, next) => {
+  if (req.body.role === "admin") {
+    const user = await User.create(req.body);
+    return res.status(201).json({
+      status: "success",
+      data: {
+        user: user,
+      },
+    });
+  } else {
+    return res.status(301).json({ status: "failed" });
+  }
 });
 
-// export const login = catchAsync(async (req, res, next) => {
-//   const { phoneNumber, password } = req.body;
+const login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
 
-//   // 1) Check if phoneNumber and password exist
-//   if (!phoneNumber || !password) {
-//     return next(new AppError(Errors.PHONE_PASS_INPUT_ISSUE, 400));
-//   }
+  // 1) Check if phoneNumber and password exist
+  if (!email || !password) {
+    return next(new AppError(Errors.PHONE_PASS_INPUT_ISSUE, 400));
+  }
+  // 2) Check if the user exists && if the password is correct
+  const user = await User.findOne({ email: email }).select("+password");
 
-//   const number = phoneSanitizer(phoneNumber);
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    return next(new AppError(Errors.PHONE_PASS_INPUT_ISSUE, 400));
+  }
 
-//   if (!number) {
-//     return next(new AppError(Errors.PHONE_INPUT_ISSUE, 402));
-//   }
+  // 3) If everyhing ok, send token to client
+  createSendToken(user, 200, res);
+});
 
-//   // 2) Check if the user exists && if the password is correct
-//   const user = await User.findOne({ phoneNumber: number }).select("+password");
+const logout = (req, res) => {
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: "success" });
+};
 
-//   if (!user || !(await user.correctPassword(password, user.password))) {
-//     return next(new AppError(Errors.PHONE_PASS_INPUT_ISSUE, 400));
-//   }
+// Connection Records
+const createConnectionRecord = catchAsync(async (req, res, next) => {
+  const connect = await Connection.create(req.body);
+  console.log("\n connection Recorded!");
+});
 
-//   if (user.role !== "user") {
-//     return createSendToken(user, 200, res);
-//   }
+const getAll = (Model) =>
+  catchAsync(async (req, res, next) => {
+    // To allow for nested GET reviews on tour (hack)
+    let filter = {};
+    const collectionCount = await Model.countDocuments();
+    const features = new APIFeatures(Model.find(filter), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate()
+      .populate();
 
-//   if (user.isPhoneNumberVarified === false) {
-//     // ! NEVER CHANGE THE MESSAGE
-//     return next(new AppError(Errors.PHONE_VERIFY, 403));
-//   }
+    // const docs = await features.query.explain();
+    const docs = await features.query;
 
-//   // 3) If everyhing ok, send token to client
-//   createSendToken(user, 200, res);
-// });
+    // Send Response
+    res.status(200).json({
+      status: "success",
+      collectionCount,
+      results: docs.length,
+      data: { data: docs },
+    });
+  });
 
-// export const logout = (req, res) => {
-//   res.cookie("jwt", "loggedout", {
-//     expires: new Date(Date.now() + 1000),
-//     httpOnly: true,
-//   });
-//   res.status(200).json({ status: "success" });
-// };
+exports.createConnectionRecord = createConnectionRecord;
+exports.getConnectionRecords = getAll(Connection);
+exports.signup = signup;
+exports.login = login;
+exports.logout = logout;
 
 // export const protect = catchAsync(async (req, res, next) => {
 //   // 1) Getting token and check if it's there
@@ -136,5 +155,3 @@ const signup = catchAsync(async (req, res, next) => {
 //     next();
 //   };
 // };
-
-exports.signup = signup;
