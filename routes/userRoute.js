@@ -12,6 +12,7 @@ const {
 } = require("../controllers/authController.js");
 
 const router = express.Router();
+
 router.get("/", admins);
 router.post("/login", login);
 router.post("/signup", signup);
@@ -28,6 +29,6 @@ router.get("/getRecords", getConnectionRecords);
 
 // router.use(protect);
 
-// router.get("/me", getMe);
+//router.get("/protect", getMe);
 
 exports.router = router;

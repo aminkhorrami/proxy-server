@@ -9,18 +9,16 @@ module.exports = {
     const server = net.createServer();
 
     server.on("connection", (clientToProxySocket) => {
-      console.log("Client Connected To Proxy");
+      console.log(
+        "Client Connected To Proxy",
+        clientToProxySocket.getMaxListeners()
+      );
+
       // We need only the data once, the starting packet
-
       clientToProxySocket.once("data", (data) => {
-        // If you want to see the packet uncomment below
-
         console.log(data.toString());
-
         let isTLSConnection = data.toString().indexOf("CONNECT") !== -1;
-
         // on the web By Default port is 80
-
         let serverPort = 80;
         let serverAddress;
         if (isTLSConnection) {
@@ -38,14 +36,12 @@ module.exports = {
         } else {
           // without certificate
           serverAddress = data.toString().split("Host: ")[1].split("\r\n")[0];
+          console.log("shiiit", serverAddress);
         }
-
         console.log("host", serverAddress);
-
         // https://nodejs.org/api/net.html#net_net_createconnection
         // A factory function, which creates a new net.Socket, immediately initiates connection with socket.connect()
         // Following is a SocketClient of the Target server
-
         let proxyToServerSocket = net.createConnection(
           {
             host: serverAddress,
@@ -53,7 +49,6 @@ module.exports = {
           },
           () => {
             // the connected callBack is actually here!
-
             console.log("PROXY TO SERVER SET UP");
             if (isTLSConnection) {
               clientToProxySocket.write("HTTP/1.1 200 OK\r\n\n");
@@ -107,14 +102,21 @@ module.exports = {
             PostRequest(recordConnection);
 
             proxyToServerSocket.on("error", (err) => {
-              console.log("PROXY TO SERVER ERROR");
+              console.log("Proxy TO SERVER ERROR");
               console.log(err);
+            });
+            proxyToServerSocket.on("close", () => {
+              console.log(`Proxy TO Server ${serverAddress} Hanged Up!`);
+              console.log();
             });
           }
         );
         clientToProxySocket.on("error", (err) => {
-          console.log("CLIENT TO PROXY ERROR");
+          console.log("Client TO PROXY ERROR");
           console.log(err);
+        });
+        clientToProxySocket.on("close", () => {
+          console.log(`Client TO PROXY Socket Hanged Up! ${serverAddress}`);
         });
       });
     });

@@ -1,7 +1,7 @@
 const http = require("http");
 
 const PostRequest = (body) => {
-  console.log("bodybodybody", body);
+  console.log("\n Socket Detail", body);
   const data = JSON.stringify(body);
   const options = {
     host: "127.0.0.1",
