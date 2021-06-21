@@ -15,7 +15,7 @@
   <body>
     <div
       x-data="setup()"
-      x-init="$refs.loading.classList.add('hidden'); setColors(color); getConnectionData(); adminCount()"
+      x-init="$refs.loading.classList.add('hidden'); setColors(color); getConnectionData(); adminCount(); userloggedIn()"
       :class="{ 'dark': isDark}"
     >
       <div class="flex h-screen antialiased text-gray-900 bg-gray-100 dark:bg-dark dark:text-light">
@@ -247,7 +247,7 @@
                 </button>
 
                 <!-- User avatar button -->
-                <div class="relative" x-data="{ open: false }">
+                <div class="relative" x-data="{ open: false  }">
                   <button
                     @click="open = !open; $nextTick(() => { if(open){ $refs.userMenu.focus() } })"
                     type="button"
@@ -285,7 +285,9 @@
                       Settings
                     </a>
                     <a
-                      @click="logout()"
+                      @click=" 
+                    localStorage.removeItem('token')
+                    window.location.assign(`./index.html`)"
                       href="#"
                       role="menuitem"
                       class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary"
@@ -417,6 +419,7 @@
                       Settings
                     </a>
                     <a
+                      @click="logout()"
                       href="#"
                       role="menuitem"
                       class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary"
@@ -1507,20 +1510,12 @@
           reload() {
             this.getConnectionData()
           },
-          async logout() {
-            fetch('http://localhost:5000/api/v1/users/logout', {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            })
-              .then((result) => {
-                console.log('Success:', result)
-                window.location.assign('./index.html')
-              })
-              .catch((error) => {
-                console.error('Error:', error)
-              })
+          async userloggedIn() {
+            // check if there is a token for now
+            // i will add a route then to check!
+            const token = window.localStorage.getItem('token')
+            if (!token) window.location.assign('./index.html')
+            else return
           },
           proxyData: {},
           adminsCount: 0,
@@ -1582,6 +1577,29 @@
           updateBarChart,
           updateDoughnutChart,
           updateLineChart,
+        }
+      }
+      const toggleProfile = () => {
+        return {
+          logout() {
+            const stat = localStorage.removeItem('token')
+            console.log('stat!', stat)
+
+            // 2
+            // fetch('http://localhost:5000/api/v1/users/logout', {
+            //   method: 'GET',
+            //   headers: {
+            //     'Content-Type': 'application/json',
+            //   },
+            // })
+            //   .then((result) => {
+            //     console.log('Success:', result)
+            //     window.location.assign('./index.html')
+            //   })
+            //   .catch((error) => {
+            //     console.error('Error:', error)
+            //   })
+          },
         }
       }
     </script>
